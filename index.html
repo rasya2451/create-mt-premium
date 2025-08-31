@@ -1,85 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MT Generator VIP Premium</title>
-  <style>
-    body { font-family: sans-serif; background:#0f172a; color:white; display:flex; justify-content:center; padding:1.5rem; }
-    .glass { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(10px); border-radius:1rem; }
-    .input { width:100%; padding:0.6rem; border-radius:0.6rem; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; }
-    .btn { background:#6366f1; border-radius:0.6rem; padding:0.6rem; text-align:center; font-weight:600; cursor:pointer; }
-    .btn:hover { background:#4f46e5; }
-    .hidden{display:none;}
-    .playlist-item{display:flex;justify-content:space-between;align-items:center;background:#1e293b;padding:0.5rem;border-radius:0.5rem;}
-    .playlist-item p{margin:0;}
-    .flex{display:flex;gap:0.4rem;}
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div class="w-full max-w-3xl space-y-6" style="width:100%;max-width:768px;">
+<body class="min-h-screen bg-slate-900 text-white flex justify-center items-start p-6">
 
-    <!-- Login -->
-    <div id="authCard" class="glass p-6 rounded-2xl" style="padding:1rem;">
-      <h2 class="text-xl font-bold">Login</h2>
-      <input id="username" placeholder="Username" class="input" style="margin-top:0.5rem;"/>
-      <input id="token" placeholder="Token" class="input" style="margin-top:0.5rem;"/>
-      <button id="loginBtn" class="btn w-full" style="margin-top:0.5rem;width:100%;">Login</button>
+  <div class="w-full max-w-3xl space-y-6">
+
+    <!-- Login Card -->
+    <div id="authCard" class="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg space-y-3">
+      <h2 class="text-2xl font-bold text-center">Login</h2>
+      <input id="username" placeholder="Username" class="w-full p-3 rounded-xl bg-white/20 focus:outline-none"/>
+      <input id="token" placeholder="Token" class="w-full p-3 rounded-xl bg-white/20 focus:outline-none"/>
+      <button id="loginBtn" class="w-full py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 font-semibold">Login</button>
     </div>
 
     <!-- Dashboard -->
-    <div id="profileCard" class="hidden glass p-6 rounded-2xl" style="padding:1rem;">
-      <div class="flex justify-between items-center" style="display:flex;justify-content:space-between;align-items:center;">
+    <div id="profileCard" class="hidden bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-lg space-y-4">
+      <div class="flex justify-between items-center">
         <div>
-          <h3 id="profileName" class="text-lg font-bold"></h3>
+          <h3 id="profileName" class="text-xl font-bold"></h3>
           <p id="profileUID" class="text-sm opacity-70"></p>
           <p id="profileRegion" class="text-sm opacity-70"></p>
         </div>
-        <button id="logoutBtn" class="btn" style="background:#ef4444;">Logout</button>
+        <button id="logoutBtn" class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-xl font-semibold">Logout</button>
       </div>
 
-      <!-- Owner Section -->
-      <div id="ownerControls" class="hidden" style="margin-top:1rem;">
-        <div class="glass" style="padding:0.6rem;margin-bottom:0.6rem;">
-          <h4>Upload MT Band</h4>
-          <textarea id="ownerMT" placeholder="Masukkan MT Band manual" class="input"></textarea>
-          <button id="uploadMTBtn" class="btn" style="margin-top:0.5rem;background:#ef4444;width:100%;">Upload MT</button>
+      <!-- Owner Only -->
+      <div id="ownerControls" class="hidden grid gap-4">
+        <div class="bg-white/5 p-4 rounded-xl space-y-2">
+          <h4 class="font-semibold">Upload MT Band</h4>
+          <textarea id="ownerMT" placeholder="Masukkan MT Band" class="w-full p-2 rounded-xl bg-white/20"></textarea>
+          <button id="uploadMTBtn" class="w-full py-2 bg-red-500 hover:bg-red-600 rounded-xl font-semibold">Upload</button>
         </div>
-        <div class="glass" style="padding:0.6rem;margin-bottom:0.6rem;">
-          <h4>Create User</h4>
-          <input id="newUsername" placeholder="Username baru" class="input"/>
-          <input id="newToken" placeholder="Token baru" class="input" style="margin-top:0.5rem;"/>
-          <button id="createUserBtn" class="btn" style="margin-top:0.5rem;background:#22c55e;width:100%;">Create</button>
+
+        <div class="bg-white/5 p-4 rounded-xl space-y-2">
+          <h4 class="font-semibold">Create User</h4>
+          <input id="newUsername" placeholder="Username baru" class="w-full p-2 rounded-xl bg-white/20"/>
+          <input id="newToken" placeholder="Token baru" class="w-full p-2 rounded-xl bg-white/20"/>
+          <button id="createUserBtn" class="w-full py-2 bg-green-500 hover:bg-green-600 rounded-xl font-semibold">Create</button>
         </div>
-        <div class="glass" style="padding:0.6rem;">
-          <h4>Tambah Lagu</h4>
-          <input id="songTitle" placeholder="Judul Lagu" class="input"/>
-          <input id="songLink" placeholder="Link Catbox (mp3)" class="input" style="margin-top:0.5rem;"/>
-          <button id="addSongBtn" class="btn" style="margin-top:0.5rem;background:#3b82f6;width:100%;">Tambah Lagu</button>
+
+        <div class="bg-white/5 p-4 rounded-xl space-y-2">
+          <h4 class="font-semibold">Tambah Lagu</h4>
+          <input id="songTitle" placeholder="Judul Lagu" class="w-full p-2 rounded-xl bg-white/20"/>
+          <input id="songLink" placeholder="Link Catbox (mp3)" class="w-full p-2 rounded-xl bg-white/20"/>
+          <button id="addSongBtn" class="w-full py-2 bg-blue-500 hover:bg-blue-600 rounded-xl font-semibold">Tambah Lagu</button>
         </div>
       </div>
 
-      <!-- User/Owner Generator -->
-      <form id="genForm" class="space-y-2" style="margin-top:1rem;">
-        <input id="uid" placeholder="UID" class="input"/>
-        <select id="region" class="input" style="margin-top:0.5rem;">
+      <!-- Generate MT -->
+      <form id="genForm" class="space-y-2">
+        <input id="uid" placeholder="UID" class="w-full p-2 rounded-xl bg-white/20"/>
+        <select id="region" class="w-full p-2 rounded-xl bg-white/20">
           <option value="ID">Indonesia</option>
           <option value="SG">Singapore</option>
           <option value="US">USA</option>
         </select>
-        <button class="btn" style="margin-top:0.5rem;width:100%;">Generate</button>
+        <button class="w-full py-2 bg-indigo-500 hover:bg-indigo-600 rounded-xl font-semibold">Generate</button>
       </form>
 
       <!-- Result -->
-      <div id="mtBandResult" class="hidden glass rounded-xl" style="padding:0.5rem;margin-top:0.6rem;display:flex;justify-content:space-between;align-items:center;">
+      <div id="mtBandResult" class="hidden bg-white/5 rounded-xl p-3 flex justify-between items-center">
         <span id="mtBandText" class="text-sm">—</span>
-        <button id="copyMTBand" class="btn" style="padding:0.2rem 0.5rem;font-size:0.8rem;">Copy</button>
+        <button id="copyMTBand" class="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 rounded-xl text-xs font-semibold">Copy</button>
       </div>
 
       <!-- Playlist -->
-      <div class="glass" style="padding:0.6rem;margin-top:0.8rem;">
-        <h4>Playlist</h4>
-        <ul id="playlist" class="space-y-2" style="list-style:none;padding:0;margin:0;"></ul>
+      <div class="bg-white/5 p-4 rounded-xl space-y-2">
+        <h4 class="font-semibold">Playlist</h4>
+        <ul id="playlist" class="space-y-2"></ul>
       </div>
     </div>
   </div>
@@ -94,9 +87,8 @@
     const getUser=()=>JSON.parse(localStorage.getItem("currentUser")||"null");
     const logout=()=>{localStorage.removeItem("currentUser");location.reload();};
 
-    // Login
     function login(username,token){
-      if(username===OWNER_USERNAME && token===OWNER_TOKEN){
+      if(username===OWNER_USERNAME&&token===OWNER_TOKEN){
         saveUser({username,token,isOwner:true}); showProfile({username,token,isOwner:true}); return;
       }
       const users=JSON.parse(localStorage.getItem("users")||"[]");
@@ -105,9 +97,10 @@
       else toast("User belum terdaftar!");
     }
 
-    // Profile
     function showProfile(user){
       $("#profileName").textContent=user.username;
+      $("#profileUID").textContent="UID: —";
+      $("#profileRegion").textContent="Region: —";
       $("#authCard").classList.add("hidden");
       $("#profileCard").classList.remove("hidden");
       if(user.isOwner) $("#ownerControls").classList.remove("hidden");
@@ -118,13 +111,11 @@
     $("#loginBtn").onclick=()=>login($("#username").value.trim(),$("#token").value.trim());
     $("#logoutBtn").onclick=logout;
 
-    // Owner Upload MT
     $("#uploadMTBtn")?.addEventListener("click",()=>{
       const t=$("#ownerMT").value.trim(); if(!t)return toast("MT kosong!");
       $("#mtBandText").textContent=t; $("#mtBandResult").classList.remove("hidden"); toast("MT Uploaded!");
     });
 
-    // Owner Create User
     $("#createUserBtn")?.addEventListener("click",()=>{
       const u=$("#newUsername").value.trim(),t=$("#newToken").value.trim();
       if(!u||!t)return toast("Isi username+token!");
@@ -133,19 +124,18 @@
       users.push({username:u,token:t}); localStorage.setItem("users",JSON.stringify(users)); toast("User dibuat!");
     });
 
-    // Songs
     const getSongs=()=>JSON.parse(localStorage.getItem("songs")||"[]");
     const saveSongs=s=>localStorage.setItem("songs",JSON.stringify(s));
 
     function renderPlaylist(isOwner){
       const songs=getSongs(),pl=$("#playlist"); pl.innerHTML="";
       songs.forEach((song,i)=>{
-        const li=document.createElement("li"); li.className="playlist-item";
-        li.innerHTML=`<div><p>${song.title}</p><p style="font-size:0.7rem;opacity:0.7">${song.link}</p></div>
-        <div class="flex">
-          <button class="btn playBtn" style="padding:0.2rem 0.5rem;font-size:0.7rem;">Play</button>
-          ${isOwner?`<button class="btn editBtn" style="background:#eab308;padding:0.2rem 0.5rem;font-size:0.7rem;">Edit</button>
-          <button class="btn deleteBtn" style="background:#ef4444;padding:0.2rem 0.5rem;font-size:0.7rem;">Hapus</button>`:""}
+        const li=document.createElement("li"); li.className="flex justify-between items-center bg-slate-800 rounded-xl p-3";
+        li.innerHTML=`<div><p class="font-semibold">${song.title}</p><p class="text-xs opacity-70">${song.link}</p></div>
+        <div class="flex gap-2">
+          <button class="px-2 py-1 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-xs font-semibold playBtn">Play</button>
+          ${isOwner?`<button class="px-2 py-1 bg-yellow-500 hover:bg-yellow-600 rounded-lg text-xs font-semibold editBtn">Edit</button>
+          <button class="px-2 py-1 bg-red-500 hover:bg-red-600 rounded-lg text-xs font-semibold deleteBtn">Hapus</button>`:""}
         </div>`;
         li.querySelector(".playBtn").onclick=()=>{const a=$("#audioPlayer");a.src=song.link;a.play();toast("Play: "+song.title);};
         if(isOwner){
@@ -163,7 +153,6 @@
       $("#songTitle").value="";$("#songLink").value=""; toast("Lagu ditambahkan!");
     });
 
-    // Generate MT
     function genMT(uid){const r=["Pelanggaran","Modifikasi","Aktivitas mencurigakan","Spam","Melanggar TOS"];return `MT-BAND-${uid}-${Math.floor(1000+Math.random()*9000)} (${r[Math.floor(Math.random()*r.length)]})`;}
     $("#genForm").onsubmit=e=>{e.preventDefault(); const uid=$("#uid").value.trim(); $("#mtBandText").textContent=genMT(uid); $("#mtBandResult").classList.remove("hidden");};
     $("#copyMTBand").onclick=()=>{navigator.clipboard.writeText($("#mtBandText").textContent); toast("Copied!");};
@@ -171,4 +160,4 @@
     const saved=getUser(); if(saved)showProfile(saved);
   </script>
 </body>
-</html>
+                                                                                                              </html>

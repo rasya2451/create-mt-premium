@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MT Generator VIP Premium</title>
+  <style>
+    body { font-family: sans-serif; background:#0f172a; color:white; display:flex; justify-content:center; padding:1.5rem; }
+    .glass { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(10px); border-radius:1rem; }
+    .input { width:100%; padding:0.6rem; border-radius:0.6rem; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; }
+    .btn { background:#6366f1; border-radius:0.6rem; padding:0.6rem; text-align:center; font-weight:600; cursor:pointer; }
+    .btn:hover { background:#4f46e5; }
+    .hidden{display:none;}
+    .playlist-item{display:flex;justify-content:space-between;align-items:center;background:#1e293b;padding:0.5rem;border-radius:0.5rem;}
+    .playlist-item p{margin:0;}
+    .flex{display:flex;gap:0.4rem;}
+  </style>
+</head>
+<body>
+  <div class="w-full max-w-3xl space-y-6" style="width:100%;max-width:768px;">
+
+    <!-- Login -->
+    <div id="authCard" class="glass p-6 rounded-2xl" style="padding:1rem;">
+      <h2 class="text-xl font-bold">Login</h2>
+      <input id="username" placeholder="Username" class="input" style="margin-top:0.5rem;"/>
+      <input id="token" placeholder="Token" class="input" style="margin-top:0.5rem;"/>
+      <button id="loginBtn" class="btn w-full" style="margin-top:0.5rem;width:100%;">Login</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="profileCard" class="hidden glass p-6 rounded-2xl" style="padding:1rem;">
+      <div class="flex justify-between items-center" style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h3 id="profileName" class="text-lg font-bold"></h3>
+          <p id="profileUID" class="text-sm opacity-70"></p>
+          <p id="profileRegion" class="text-sm opacity-70"></p>
+        </div>
+        <button id="logoutBtn" class="btn" style="background:#ef4444;">Logout</button>
+      </div>
+
+      <!-- Owner Section -->
+      <div id="ownerControls" class="hidden" style="margin-top:1rem;">
+        <div class="glass" style="padding:0.6rem;margin-bottom:0.6rem;">
+          <h4>Upload MT Band</h4>
+          <textarea id="ownerMT" placeholder="Masukkan MT Band manual" class="input"></textarea>
+          <button id="uploadMTBtn" class="btn" style="margin-top:0.5rem;background:#ef4444;width:100%;">Upload MT</button>
+        </div>
+        <div class="glass" style="padding:0.6rem;margin-bottom:0.6rem;">
+          <h4>Create User</h4>
+          <input id="newUsername" placeholder="Username baru" class="input"/>
+          <input id="newToken" placeholder="Token baru" class="input" style="margin-top:0.5rem;"/>
+          <button id="createUserBtn" class="btn" style="margin-top:0.5rem;background:#22c55e;width:100%;">Create</button>
+        </div>
+        <div class="glass" style="padding:0.6rem;">
+          <h4>Tambah Lagu</h4>
+          <input id="songTitle" placeholder="Judul Lagu" class="input"/>
+          <input id="songLink" placeholder="Link Catbox (mp3)" class="input" style="margin-top:0.5rem;"/>
+          <button id="addSongBtn" class="btn" style="margin-top:0.5rem;background:#3b82f6;width:100%;">Tambah Lagu</button>
+        </div>
+      </div>
+
+      <!-- User/Owner Generator -->
+      <form id="genForm" class="space-y-2" style="margin-top:1rem;">
+        <input id="uid" placeholder="UID" class="input"/>
+        <select id="region" class="input" style="margin-top:0.5rem;">
+          <option value="ID">Indonesia</option>
+          <option value="SG">Singapore</option>
+          <option value="US">USA</option>
+        </select>
+        <button class="btn" style="margin-top:0.5rem;width:100%;">Generate</button>
+      </form>
+
+      <!-- Result -->
+      <div id="mtBandResult" class="hidden glass rounded-xl" style="padding:0.5rem;margin-top:0.6rem;display:flex;justify-content:space-between;align-items:center;">
+        <span id="mtBandText" class="text-sm">—</span>
+        <button id="copyMTBand" class="btn" style="padding:0.2rem 0.5rem;font-size:0.8rem;">Copy</button>
+      </div>
+
+      <!-- Playlist -->
+      <div class="glass" style="padding:0.6rem;margin-top:0.8rem;">
+        <h4>Playlist</h4>
+        <ul id="playlist" class="space-y-2" style="list-style:none;padding:0;margin:0;"></ul>
+      </div>
+    </div>
+  </div>
+
+  <audio id="audioPlayer" controls class="hidden"></audio>
+
+  <script>
+    const OWNER_USERNAME="admin",OWNER_TOKEN="242410";
+    const $=s=>document.querySelector(s);
+    const toast=msg=>alert(msg);
+    const saveUser=u=>localStorage.setItem("currentUser",JSON.stringify(u));
+    const getUser=()=>JSON.parse(localStorage.getItem("currentUser")||"null");
+    const logout=()=>{localStorage.removeItem("currentUser");location.reload();};
+
+    // Login
+    function login(username,token){
+      if(username===OWNER_USERNAME && token===OWNER_TOKEN){
+        saveUser({username,token,isOwner:true}); showProfile({username,token,isOwner:true}); return;
+      }
+      const users=JSON.parse(localStorage.getItem("users")||"[]");
+      const f=users.find(u=>u.username===username&&u.token===token);
+      if(f){saveUser({username,token,isOwner:false});showProfile({username,token,isOwner:false});}
+      else toast("User belum terdaftar!");
+    }
+
+    // Profile
+    function showProfile(user){
+      $("#profileName").textContent=user.username;
+      $("#authCard").classList.add("hidden");
+      $("#profileCard").classList.remove("hidden");
+      if(user.isOwner) $("#ownerControls").classList.remove("hidden");
+      else $("#ownerControls").classList.add("hidden");
+      renderPlaylist(user.isOwner);
+    }
+
+    $("#loginBtn").onclick=()=>login($("#username").value.trim(),$("#token").value.trim());
+    $("#logoutBtn").onclick=logout;
+
+    // Owner Upload MT
+    $("#uploadMTBtn")?.addEventListener("click",()=>{
+      const t=$("#ownerMT").value.trim(); if(!t)return toast("MT kosong!");
+      $("#mtBandText").textContent=t; $("#mtBandResult").classList.remove("hidden"); toast("MT Uploaded!");
+    });
+
+    // Owner Create User
+    $("#createUserBtn")?.addEventListener("click",()=>{
+      const u=$("#newUsername").value.trim(),t=$("#newToken").value.trim();
+      if(!u||!t)return toast("Isi username+token!");
+      let users=JSON.parse(localStorage.getItem("users")||"[]");
+      if(users.find(x=>x.username===u))return toast("Username sudah ada!");
+      users.push({username:u,token:t}); localStorage.setItem("users",JSON.stringify(users)); toast("User dibuat!");
+    });
+
+    // Songs
+    const getSongs=()=>JSON.parse(localStorage.getItem("songs")||"[]");
+    const saveSongs=s=>localStorage.setItem("songs",JSON.stringify(s));
+
+    function renderPlaylist(isOwner){
+      const songs=getSongs(),pl=$("#playlist"); pl.innerHTML="";
+      songs.forEach((song,i)=>{
+        const li=document.createElement("li"); li.className="playlist-item";
+        li.innerHTML=`<div><p>${song.title}</p><p style="font-size:0.7rem;opacity:0.7">${song.link}</p></div>
+        <div class="flex">
+          <button class="btn playBtn" style="padding:0.2rem 0.5rem;font-size:0.7rem;">Play</button>
+          ${isOwner?`<button class="btn editBtn" style="background:#eab308;padding:0.2rem 0.5rem;font-size:0.7rem;">Edit</button>
+          <button class="btn deleteBtn" style="background:#ef4444;padding:0.2rem 0.5rem;font-size:0.7rem;">Hapus</button>`:""}
+        </div>`;
+        li.querySelector(".playBtn").onclick=()=>{const a=$("#audioPlayer");a.src=song.link;a.play();toast("Play: "+song.title);};
+        if(isOwner){
+          li.querySelector(".editBtn").onclick=()=>{const nt=prompt("Judul:",song.title)||song.title; const nl=prompt("Link:",song.link)||song.link; songs[i]={title:nt,link:nl}; saveSongs(songs); renderPlaylist(true);};
+          li.querySelector(".deleteBtn").onclick=()=>{songs.splice(i,1); saveSongs(songs); renderPlaylist(true);};
+        }
+        pl.appendChild(li);
+      });
+    }
+
+    $("#addSongBtn")?.addEventListener("click",()=>{
+      const t=$("#songTitle").value.trim(),l=$("#songLink").value.trim();
+      if(!t||!l)return toast("Isi judul+link!");
+      const s=getSongs(); s.push({title:t,link:l}); saveSongs(s); renderPlaylist(true);
+      $("#songTitle").value="";$("#songLink").value=""; toast("Lagu ditambahkan!");
+    });
+
+    // Generate MT
+    function genMT(uid){const r=["Pelanggaran","Modifikasi","Aktivitas mencurigakan","Spam","Melanggar TOS"];return `MT-BAND-${uid}-${Math.floor(1000+Math.random()*9000)} (${r[Math.floor(Math.random()*r.length)]})`;}
+    $("#genForm").onsubmit=e=>{e.preventDefault(); const uid=$("#uid").value.trim(); $("#mtBandText").textContent=genMT(uid); $("#mtBandResult").classList.remove("hidden");};
+    $("#copyMTBand").onclick=()=>{navigator.clipboard.writeText($("#mtBandText").textContent); toast("Copied!");};
+
+    const saved=getUser(); if(saved)showProfile(saved);
+  </script>
+</body>
+</html>

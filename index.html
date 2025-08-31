@@ -1,567 +1,178 @@
-<!doctype html>
-<html lang="id">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MT Band VIP</title>
-
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Inter font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --glass-bg: rgba(255,255,255,0.04);
-      --glass-border: rgba(255,255,255,0.06);
-      --accent-from: #7c3aed;
-      --accent-to: #06b6d4;
-    }
-    html,body{height:100%}
-    body{
-      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: radial-gradient(1200px 400px at 10% 10%, rgba(124,58,237,0.12), transparent 6%),
-                  radial-gradient(1000px 300px at 90% 90%, rgba(6,182,212,0.06), transparent 8%),
-                  #081026;
-      color: #e6eef8;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      display:flex;
-      align-items:start;
-      justify-content:center;
-      padding:48px 16px;
-    }
-
-    /* Card */
+    body { font-family: 'Inter', sans-serif; }
     .card {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(8px);
-      border-radius:16px;
-      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      @apply bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl p-6;
     }
-
-    /* Inputs */
-    .input, .textarea, select {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.04);
-      padding: 10px 12px;
-      border-radius: 12px;
-      color: inherit;
-      outline: none;
-      transition: box-shadow .15s, border-color .15s, transform .07s;
-    }
-    .input:focus, .textarea:focus, select:focus {
-      box-shadow: 0 6px 24px rgba(99,102,241,0.12);
-      border-color: rgba(124,58,237,0.7);
-      transform: translateY(-1px);
-    }
-
-    /* Buttons */
     .btn {
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-weight: 600;
-      transition: transform .08s, box-shadow .12s, opacity .12s;
+      @apply w-full py-2 rounded-xl font-semibold text-white transition;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
     }
-    .btn:active{transform:translateY(1px)}
-    .btn-grad {
-      background: linear-gradient(90deg, var(--accent-from), var(--accent-to));
-      box-shadow: 0 8px 22px rgba(7,89,133,0.12);
-    }
-
-    /* Result code */
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
-      letter-spacing: 0.6px;
-    }
-
-    /* playlist item */
-    .song-card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border: 1px solid rgba(255,255,255,0.03);
-      padding: 10px;
-      border-radius: 10px;
-    }
-
-    /* small helpers */
-    .muted { color: #9aa4b2; font-size: 13px; }
-    .small { font-size: 13px; }
-    .gap-8 { gap: 2rem; }
-
-    /* responsive */
-    @media (min-width: 1024px){
-      .layout { width: 980px; display:grid; grid-template-columns: 1fr 360px; gap:24px; align-items:start; }
-    }
-    @media (max-width: 1023px){
-      .layout { width: 100%; display:block; }
+    .btn:hover { opacity: .9; }
+    .input {
+      @apply w-full p-3 rounded-xl bg-white/20 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400;
     }
   </style>
 </head>
-<body>
-  <main class="layout w-full">
+<body class="min-h-screen bg-slate-900 flex justify-center items-center p-6">
 
-    <!-- LEFT: Main generator -->
-    <section class="card p-6">
-      <div class="flex items-center justify-between mb-4">
+  <div class="w-full max-w-3xl">
+
+    <!-- Login -->
+    <div id="authCard" class="card space-y-4">
+      <h2 class="text-3xl font-bold text-center text-white">Login</h2>
+      <input id="username" placeholder="Username" class="input"/>
+      <input id="token" placeholder="Token" type="password" class="input"/>
+      <button id="loginBtn" class="btn">Login</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="profileCard" class="hidden card space-y-6">
+      <div class="flex justify-between items-center">
         <div>
-          <h1 class="text-2xl font-bold">MT Band VIP</h1>
-          <p class="muted small -mt-1">Generator • Owner-managed • Playlist</p>
+          <h3 id="profileName" class="text-xl font-bold"></h3>
+          <p id="profileUID" class="text-sm opacity-70"></p>
+          <p id="profileRegion" class="text-sm opacity-70"></p>
         </div>
-        <div class="text-right muted small">Demo • Local-only</div>
+        <button id="logoutBtn" class="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 font-semibold">Logout</button>
       </div>
 
-      <!-- Generator form -->
-      <div class="grid gap-4">
-        <form id="genForm" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label class="small muted">User / UID</label>
-            <input id="uid" class="input w-full mt-1" placeholder="e.g. 1234567890" />
-          </div>
-          <div>
-            <label class="small muted">Region</label>
-            <select id="region" class="input w-full mt-1">
-              <option value="ID">Indonesia (ID)</option>
-              <option value="SG">Singapore (SG)</option>
-              <option value="US">United States (US)</option>
-              <option value="BR">Brazil (BR)</option>
-              <option value="IN">India (IN)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="small muted">Type</label>
-            <select id="type" class="input w-full mt-1">
-              <option>Diamond</option>
-              <option>Coin</option>
-              <option>Token</option>
-              <option>Voucher</option>
-            </select>
-          </div>
-          <div>
-            <label class="small muted">Amount</label>
-            <input id="amount" type="number" min="1" value="100" class="input w-full mt-1" />
-          </div>
-
-          <div class="md:col-span-2">
-            <label class="small muted">Notes (optional)</label>
-            <textarea id="notes" rows="2" class="textarea w-full mt-1" placeholder="Any additional info…"></textarea>
-          </div>
-
-          <div class="md:col-span-2 flex gap-3 items-center">
-            <button type="submit" class="btn btn-grad flex-1">Generate</button>
-            <button type="button" id="copyLast" class="btn border border-white/6 px-4">Copy last</button>
-            <div id="statusMsg" class="muted small"></div>
-          </div>
-        </form>
-
-        <!-- result card -->
-        <div class="card p-4 mt-2">
-          <div class="flex justify-between items-start gap-4">
-            <div>
-              <div class="muted small">Result</div>
-              <div id="resultCode" class="mono text-lg font-medium mt-2 break-words">—</div>
-            </div>
-            <div class="flex flex-col gap-2">
-              <button id="btnCopy" class="btn border border-white/6 px-4">Copy</button>
-              <button id="btnSave" class="btn border border-white/6 px-4">Save</button>
-            </div>
-          </div>
-
-          <!-- MT Band result -->
-          <div id="mtBandResult" class="mt-3 hidden p-3 rounded-md song-card flex items-center justify-between">
-            <div class="break-words" id="mtBandText">—</div>
-            <div class="flex items-center gap-2">
-              <button id="copyMTBand" class="btn btn-grad px-3 py-1 text-sm">Copy</button>
-            </div>
-          </div>
+      <!-- Owner Controls -->
+      <div id="ownerControls" class="hidden space-y-4">
+        <div class="card space-y-2">
+          <h4 class="font-semibold">Upload MT Band</h4>
+          <textarea id="ownerMT" placeholder="Masukkan MT Band" class="input"></textarea>
+          <button id="uploadMTBtn" class="btn">Upload</button>
         </div>
 
-        <!-- Playlist -->
-        <div class="card p-4">
-          <div class="flex items-center justify-between">
-            <h3 class="font-semibold">Playlist</h3>
-            <div class="muted small">Streaming via catbox / direct mp3</div>
-          </div>
-          <div id="playlist" class="mt-3 space-y-3"></div>
+        <div class="card space-y-2">
+          <h4 class="font-semibold">Create User</h4>
+          <input id="newUsername" placeholder="Username baru" class="input"/>
+          <input id="newToken" placeholder="Token baru" class="input"/>
+          <button id="createUserBtn" class="btn">Create User</button>
         </div>
-      </div>
-    </section>
 
-    <!-- RIGHT: Auth, profile, owner panels -->
-    <aside class="space-y-4">
-      <!-- Auth card -->
-      <div id="authCard" class="card p-5 w-full">
-        <h3 class="font-semibold">Create / Login</h3>
-        <p class="muted small">Owner: <strong>admin</strong> / token <strong>242410</strong></p>
-        <div class="mt-3 space-y-2">
-          <input id="authUsername" class="input w-full" placeholder="Username" />
-          <input id="authToken" class="input w-full" placeholder="Token" />
-          <button id="authSaveBtn" class="btn btn-grad w-full mt-2">Save / Login</button>
+        <div class="card space-y-2">
+          <h4 class="font-semibold">Tambah Lagu</h4>
+          <input id="songTitle" placeholder="Judul Lagu" class="input"/>
+          <input id="songLink" placeholder="Link Catbox (mp3)" class="input"/>
+          <button id="addSongBtn" class="btn">Tambah Lagu</button>
         </div>
       </div>
 
-      <!-- Profile card -->
-      <div id="profileCard" class="card p-4 hidden w-full">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-teal-400 grid place-items-center font-bold">U</div>
-          <div>
-            <div id="profileName" class="font-semibold">Guest</div>
-            <div id="profileUID" class="muted small">UID: —</div>
-            <div id="profileRegion" class="muted small">Region: —</div>
-          </div>
-        </div>
+      <!-- Generate MT -->
+      <form id="genForm" class="space-y-3">
+        <input id="uid" placeholder="UID" class="input"/>
+        <select id="region" class="input">
+          <option value="ID">Indonesia</option>
+          <option value="SG">Singapore</option>
+          <option value="US">USA</option>
+        </select>
+        <button class="btn">Generate</button>
+      </form>
 
-        <div class="mt-3 space-y-2" id="ownerPanels" style="display:none">
-          <!-- Owner: Upload MT -->
-          <div class="p-3 rounded-lg" style="background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); border-radius:12px;">
-            <div class="flex items-center justify-between">
-              <div class="font-medium">Owner Controls</div>
-              <div class="muted small">Owner only</div>
-            </div>
-            <div class="mt-2 space-y-2">
-              <textarea id="ownerMT" class="textarea w-full" placeholder="Manual MT text"></textarea>
-              <div class="flex gap-2">
-                <button id="uploadMTBtn" class="btn bg-red-500 hover:bg-red-600 flex-1">Upload MT</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Owner: Create user -->
-          <div class="p-3 rounded-lg" style="background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); border-radius:12px;">
-            <div class="font-medium">Create User</div>
-            <div class="mt-2 space-y-2">
-              <input id="newUsername" class="input w-full" placeholder="username" />
-              <input id="newToken" class="input w-full" placeholder="token" />
-              <button id="createUserBtn" class="btn bg-green-500 hover:bg-green-600 w-full">Create</button>
-            </div>
-          </div>
-
-          <!-- Owner: Song manager -->
-          <div class="p-3 rounded-lg" style="background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); border-radius:12px;">
-            <div class="font-medium">Songs (catbox links)</div>
-            <div class="mt-2 space-y-2">
-              <input id="songTitle" class="input w-full" placeholder="Title (e.g. lagu1)" />
-              <input id="songUrl" class="input w-full" placeholder="MP3 URL (catbox)" />
-              <div class="flex gap-2">
-                <button id="addSongBtn" class="btn btn-grad flex-1">Add Song</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3 flex gap-2">
-          <button id="logoutBtn" class="btn bg-red-600 hover:bg-red-700 flex-1">Logout</button>
-        </div>
+      <!-- MT Result -->
+      <div id="mtBandResult" class="hidden bg-white/5 rounded-xl p-3 flex justify-between items-center">
+        <span id="mtBandText" class="text-sm">—</span>
+        <button id="copyMTBand" class="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 rounded-xl text-xs font-semibold">Copy</button>
       </div>
 
-      <!-- Activity -->
-      <div class="card p-4">
-        <div class="flex items-center justify-between">
-          <div class="font-medium">Activity</div>
-          <div class="muted small">Local</div>
-        </div>
-        <div id="activityBody" class="mt-3 muted small">No activity yet.</div>
+      <!-- Playlist -->
+      <div class="card space-y-2">
+        <h4 class="font-semibold">Playlist</h4>
+        <ul id="playlist" class="space-y-2"></ul>
       </div>
-    </aside>
+    </div>
+  </div>
 
-  </main>
+  <audio id="audioPlayer" controls class="hidden"></audio>
 
-  <!-- audio element -->
-  <audio id="audioPlayer" class="hidden"></audio>
-
-  <!-- Inline script: logic -->
   <script>
-    // Credentials
-    const OWNER_USERNAME = 'admin';
-    const OWNER_TOKEN = '242410';
+    const OWNER_USERNAME="admin",OWNER_TOKEN="242410";
+    const $=s=>document.querySelector(s);
+    const toast=msg=>alert(msg);
+    const saveUser=u=>localStorage.setItem("currentUser",JSON.stringify(u));
+    const getUser=()=>JSON.parse(localStorage.getItem("currentUser")||"null");
+    const logout=()=>{localStorage.removeItem("currentUser");location.reload();};
 
-    // Helpers
-    const $ = (s) => document.querySelector(s);
-    const $all = (s) => document.querySelectorAll(s);
-    const toast = (t) => { try{ openToast(t); } catch(e){ alert(t); } };
-
-    // small toast fallback (non-blocking)
-    function openToast(text){
-      const el = document.createElement('div');
-      el.textContent = text;
-      Object.assign(el.style, {
-        position:'fixed',left:'50%',transform:'translateX(-50%)',bottom:'28px',
-        background:'linear-gradient(90deg,#0f172a,#0b1220)',
-        color:'#fff',padding:'10px 14px',borderRadius:'10px',boxShadow:'0 8px 24px rgba(2,6,23,0.6)',zIndex:9999,opacity:0
-      });
-      document.body.appendChild(el);
-      requestAnimationFrame(()=>el.style.opacity=1);
-      setTimeout(()=>{ el.style.opacity=0; setTimeout(()=>el.remove(),300); },1400);
+    function login(username,token){
+      if(username===OWNER_USERNAME&&token===OWNER_TOKEN){
+        saveUser({username,token,isOwner:true}); showProfile({username,token,isOwner:true}); return;
+      }
+      const users=JSON.parse(localStorage.getItem("users")||"[]");
+      const f=users.find(u=>u.username===username&&u.token===token);
+      if(f){saveUser({username,token,isOwner:false});showProfile({username,token,isOwner:false});}
+      else toast("User belum terdaftar!");
     }
 
-    // Storage keys
-    const KEY_CUR = 'mtgen_current_user';
-    const KEY_USERS = 'mtgen_users';
-    const KEY_SONGS = 'mtgen_songs';
-    const KEY_ACT = 'mtgen_act';
-    const KEY_LAST = 'mtgen_last';
-
-    // load/save
-    function loadUsers(){ try{ return JSON.parse(localStorage.getItem(KEY_USERS)||'[]'); }catch{ return []; } }
-    function saveUsers(arr){ localStorage.setItem(KEY_USERS, JSON.stringify(arr)); }
-    function loadSongs(){ try{ return JSON.parse(localStorage.getItem(KEY_SONGS)||'[]'); }catch{ return []; } }
-    function saveSongs(arr){ localStorage.setItem(KEY_SONGS, JSON.stringify(arr)); }
-    function loadActivity(){ try{ return JSON.parse(localStorage.getItem(KEY_ACT)||'[]'); }catch{ return []; } }
-    function saveActivity(arr){ localStorage.setItem(KEY_ACT, JSON.stringify(arr)); }
-    function saveCurrent(user){ localStorage.setItem(KEY_CUR, JSON.stringify(user)); }
-    function loadCurrent(){ try{ return JSON.parse(localStorage.getItem(KEY_CUR)||'null'); }catch{return null;} }
-
-    // UI elements
-    const authCard = $('#authCard');
-    const profileCard = $('#profileCard');
-    const ownerPanels = $('#ownerPanels');
-    const playlistEl = $('#playlist');
-    const audio = $('#audioPlayer');
-
-    // AUTH
-    $('#authSaveBtn').addEventListener('click', () => {
-      const u = $('#authUsername').value.trim();
-      const t = $('#authToken').value.trim();
-      if(!u||!t) return toast('Username & token required');
-      // owner quick auth
-      if(u === OWNER_USERNAME && t === OWNER_TOKEN){
-        const owner = { username:u, token:t, isOwner:true, uid:'', region:'' };
-        saveCurrent(owner);
-        showProfile(owner);
-        toast('Owner logged in');
-        return;
-      }
-      // check registered users list
-      const users = loadUsers();
-      const found = users.find(x => x.username === u && x.token === t);
-      if(found){
-        const cur = { username:u, token:t, isOwner:false, uid: found.uid || '', region: found.region || '' };
-        saveCurrent(cur);
-        showProfile(cur);
-        toast('User logged in');
-      } else {
-        toast('Username/token belum terdaftar (Owner harus buat dulu)');
-      }
-    });
-
-    // show profile + panels
     function showProfile(user){
-      $('#profileName').textContent = user.username;
-      $('#profileUID').textContent = 'UID: ' + (user.uid || '—');
-      $('#profileRegion').textContent = 'Region: ' + (user.region || '—');
-      authCard.style.display = 'none';
-      profileCard.style.display = 'block';
-      // owner panels
-      if(user.isOwner){
-        ownerPanels.style.display = 'block';
-      } else ownerPanels.style.display = 'none';
-      renderSongs(user.isOwner);
-      renderActivity();
+      $("#profileName").textContent=user.username;
+      $("#profileUID").textContent="UID: —";
+      $("#profileRegion").textContent="Region: —";
+      $("#authCard").classList.add("hidden");
+      $("#profileCard").classList.remove("hidden");
+      if(user.isOwner) $("#ownerControls").classList.remove("hidden");
+      else $("#ownerControls").classList.add("hidden");
+      renderPlaylist(user.isOwner);
     }
 
-    // logout
-    $('#logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem(KEY_CUR);
-      location.reload();
+    $("#loginBtn").onclick=()=>login($("#username").value.trim(),$("#token").value.trim());
+    $("#logoutBtn").onclick=logout;
+
+    $("#uploadMTBtn")?.addEventListener("click",()=>{
+      const t=$("#ownerMT").value.trim(); if(!t)return toast("MT kosong!");
+      $("#mtBandText").textContent=t; $("#mtBandResult").classList.remove("hidden"); toast("MT Uploaded!");
     });
 
-    // owner: create user
-    $('#createUserBtn').addEventListener('click', () => {
-      const un = $('#newUsername').value.trim();
-      const tk = $('#newToken').value.trim();
-      if(!un||!tk) return toast('Isi username & token!');
-      if(un === OWNER_USERNAME) return toast('Tidak boleh membuat admin');
-      const users = loadUsers();
-      if(users.find(u=>u.username===un)) return toast('Username sudah ada');
-      users.push({ username:un, token:tk, uid:'', region:'' });
-      saveUsers(users);
-      $('#newUsername').value=''; $('#newToken').value='';
-      toast('User berhasil dibuat');
+    $("#createUserBtn")?.addEventListener("click",()=>{
+      const u=$("#newUsername").value.trim(),t=$("#newToken").value.trim();
+      if(!u||!t)return toast("Isi username+token!");
+      let users=JSON.parse(localStorage.getItem("users")||"[]");
+      if(users.find(x=>x.username===u))return toast("Username sudah ada!");
+      users.push({username:u,token:t}); localStorage.setItem("users",JSON.stringify(users)); toast("User dibuat!");
     });
 
-    // owner: upload MT manual
-    $('#uploadMTBtn').addEventListener('click', () => {
-      const txt = $('#ownerMT').value.trim();
-      if(!txt) return toast('MT tidak boleh kosong');
-      $('#mtBandText').textContent = txt;
-      $('#mtBandResult').classList.remove('hidden');
-      toast('MT uploaded');
-    });
+    const getSongs=()=>JSON.parse(localStorage.getItem("songs")||"[]");
+    const saveSongs=s=>localStorage.setItem("songs",JSON.stringify(s));
 
-    // SONGS (owner add/edit/delete, user play)
-    $('#addSongBtn').addEventListener('click', () => {
-      const title = $('#songTitle').value.trim();
-      const url = $('#songUrl').value.trim();
-      if(!title||!url) return toast('Isi title & url');
-      const songs = loadSongs();
-      songs.push({ id: Date.now(), title, url });
-      saveSongs(songs);
-      $('#songTitle').value=''; $('#songUrl').value='';
-      const cur = loadCurrent();
-      renderSongs(cur && cur.isOwner);
-      toast('Song added');
-    });
-
-    function renderSongs(isOwner){
-      const songs = loadSongs();
-      playlistEl.innerHTML = '';
-      if(!songs.length){ playlistEl.innerHTML = '<div class="muted small">No songs yet.</div>'; return; }
-      songs.forEach((s, idx) => {
-        const wrap = document.createElement('div');
-        wrap.className = 'song-card flex items-center justify-between';
-        wrap.style.display = 'flex';
-        wrap.style.gap = '12px';
-        wrap.innerHTML = `
-          <div style="flex:1;min-width:0">
-            <div class="font-semibold truncate">${escapeHtml(s.title)}</div>
-            <div class="muted small truncate" style="max-width:100%">${escapeHtml(s.url)}</div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <button class="btn btn-grad play" data-idx="${idx}" style="padding:6px 10px">Play</button>
-            ${isOwner ? `<button class="btn" data-idx="${idx}" data-action="edit" style="background:#f59e0b;padding:6px 10px">Edit</button>
-            <button class="btn" data-idx="${idx}" data-action="del" style="background:#ef4444;padding:6px 10px">Hapus</button>` : ''}
-          </div>
-        `;
-        playlistEl.appendChild(wrap);
-      });
-
-      // attach handlers
-      playlistEl.querySelectorAll('.play').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          const id = +btn.dataset.idx;
-          const s = songs[id];
-          if(!s) return;
-          audio.src = s.url;
-          audio.play().then(()=> {
-            toast('Playing: ' + s.title);
-            audio.classList.remove('hidden');
-          }).catch(err=>{
-            console.error(err);
-            toast('Gagal memutar. Cek link.');
-          });
-        });
-      });
-
-      playlistEl.querySelectorAll('[data-action]').forEach(btn=>{
-        btn.addEventListener('click', (e)=>{
-          const idx = +btn.dataset.idx;
-          const action = btn.dataset.action;
-          if(action === 'edit'){
-            const curS = songs[idx];
-            const nt = prompt('Edit title:', curS.title) || curS.title;
-            const nl = prompt('Edit url:', curS.url) || curS.url;
-            songs[idx] = { ...curS, title: nt, url: nl };
-            saveSongs(songs);
-            const cur = loadCurrent();
-            renderSongs(cur && cur.isOwner);
-          } else if(action === 'del'){
-            if(!confirm('Hapus lagu ini?')) return;
-            songs.splice(idx,1);
-            saveSongs(songs);
-            const cur = loadCurrent();
-            renderSongs(cur && cur.isOwner);
-          }
-        });
-      });
-    }
-
-    // GENERATOR (fake) + MT band generation
-    function fakeGenerate({ uid, region, type, amount, notes }){
-      const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      const chunk = (n)=>Array.from({length:n},()=>alphabet[Math.floor(Math.random()*alphabet.length)]).join('');
-      const code = `${type.slice(0,3).toUpperCase()}-${chunk(4)}-${chunk(4)}-${chunk(4)}-${chunk(4)}`;
-      return new Promise(res => setTimeout(()=>res({ ok:true, txId: crypto.randomUUID(), code, status:'SUCCESS' }), 700 + Math.random()*400));
-    }
-
-    function generateMTBand(uid){
-      const reasons = ['Pelanggaran Kebijakan Privasi','Penggunaan Aplikasi Modifikasi','Aktivitas mencurigakan terdeteksi','Spam pesan berlebihan','Melanggar Ketentuan Layanan'];
-      const reason = reasons[Math.floor(Math.random()*reasons.length)];
-      const id = uid || Math.floor(100000 + Math.random()*900000);
-      return `MT-BAND-${id}-${Math.floor(1000+Math.random()*9000)} (${reason})`;
-    }
-
-    $('#genForm').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const cur = loadCurrent();
-      if(!cur){ toast('Login dulu sebelum generate'); return; }
-      const uid = $('#uid').value.trim();
-      const region = $('#region').value;
-      const type = $('#type').value;
-      const amount = Number($('#amount').value || 0);
-      const notes = $('#notes').value.trim();
-      if(!uid) return toast('UID required');
-      if(amount <= 0) return toast('Amount must be > 0');
-
-      $('#statusMsg').textContent = 'Processing…';
-      try {
-        const res = await fakeGenerate({ uid, region, type, amount, notes });
-        if(res.ok){
-          $('#resultCode').textContent = res.code;
-          const mt = generateMTBand(uid);
-          $('#mtBandText').textContent = mt;
-          $('#mtBandResult').classList.remove('hidden');
-          toast('Generated!');
-          // activity
-          const acts = loadActivity();
-          acts.unshift({ time: Date.now(), uid, type, amount, code: res.code });
-          saveActivity(acts);
-          renderActivity();
-          localStorage.setItem(KEY_LAST, res.code);
-          // update stored user record if exists
-          let users = loadUsers();
-          const found = users.find(u => u.username === cur.username && u.token === cur.token);
-          if(found){ found.uid = uid; found.region = region; saveUsers(users); }
-          // update current snapshot
-          cur.uid = uid; cur.region = region; saveCurrent(cur);
-          showProfile(cur);
-          $('#statusMsg').textContent = `TX: ${res.txId} • ${res.status}`;
-        } else {
-          $('#statusMsg').textContent = 'Failed';
-          toast('Failed');
+    function renderPlaylist(isOwner){
+      const songs=getSongs(),pl=$("#playlist"); pl.innerHTML="";
+      songs.forEach((song,i)=>{
+        const li=document.createElement("li"); li.className="flex justify-between items-center bg-slate-800 rounded-xl p-3";
+        li.innerHTML=`<div><p class="font-semibold">${song.title}</p><p class="text-xs opacity-70">${song.link}</p></div>
+        <div class="flex gap-2">
+          <button class="px-2 py-1 bg-indigo-500 hover:bg-indigo-600 rounded-lg text-xs font-semibold playBtn">Play</button>
+          ${isOwner?`<button class="px-2 py-1 bg-yellow-500 hover:bg-yellow-600 rounded-lg text-xs font-semibold editBtn">Edit</button>
+          <button class="px-2 py-1 bg-red-500 hover:bg-red-600 rounded-lg text-xs font-semibold deleteBtn">Hapus</button>`:""}
+        </div>`;
+        li.querySelector(".playBtn").onclick=()=>{const a=$("#audioPlayer");a.src=song.link;a.play();toast("Play: "+song.title);};
+        if(isOwner){
+          li.querySelector(".editBtn").onclick=()=>{const nt=prompt("Judul:",song.title)||song.title; const nl=prompt("Link:",song.link)||song.link; songs[i]={title:nt,link:nl}; saveSongs(songs); renderPlaylist(true);};
+          li.querySelector(".deleteBtn").onclick=()=>{songs.splice(i,1); saveSongs(songs); renderPlaylist(true);};
         }
-      } catch(err){
-        console.error(err);
-        $('#statusMsg').textContent = 'Error';
-        toast('Error occurred');
-      }
-    });
-
-    // copy helpers
-    $('#btnCopy').addEventListener('click', ()=>{
-      const t = $('#resultCode').textContent.trim();
-      if(!t || t === '—') return;
-      navigator.clipboard.writeText(t).then(()=>toast('Copied!'));
-    });
-    $('#copyLast').addEventListener('click', ()=>{
-      const last = localStorage.getItem(KEY_LAST);
-      if(last) navigator.clipboard.writeText(last).then(()=>toast('Last copied'));
-      else toast('No last code yet');
-    });
-    $('#copyMTBand').addEventListener('click', ()=>{
-      const t = $('#mtBandText').textContent.trim();
-      if(!t || t === '—') return;
-      navigator.clipboard.writeText(t).then(()=>toast('MT Band copied'));
-    });
-
-    // activity rendering
-    function renderActivity(){
-      const list = loadActivity();
-      if(!list.length){ $('#activityBody').innerHTML = '<div class="muted small">No activity yet.</div>'; return; }
-      const html = list.slice(0, 30).map(it => `<div class="small"><span class="muted">${new Date(it.time).toLocaleString()}</span> — <strong>${escapeHtml(it.uid)}</strong> • ${escapeHtml(it.type)} • ${it.amount} • <span class="mono">${escapeHtml(it.code)}</span></div>`).join('');
-      $('#activityBody').innerHTML = html;
+        pl.appendChild(li);
+      });
     }
 
-    // helpers
-    function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    $("#addSongBtn")?.addEventListener("click",()=>{
+      const t=$("#songTitle").value.trim(),l=$("#songLink").value.trim();
+      if(!t||!l)return toast("Isi judul+link!");
+      const s=getSongs(); s.push({title:t,link:l}); saveSongs(s); renderPlaylist(true);
+      $("#songTitle").value="";$("#songLink").value=""; toast("Lagu ditambahkan!");
+    });
 
-    // init: resume session if present
-    (function init(){
-      const cur = loadCurrent();
-      if(cur) showProfile(cur);
-      renderSongs(cur && cur.isOwner);
-      renderActivity();
-    })();
+    function genMT(uid){const r=["Pelanggaran","Modifikasi","Aktivitas mencurigakan","Spam","Melanggar TOS"];return `MT-BAND-${uid}-${Math.floor(1000+Math.random()*9000)} (${r[Math.floor(Math.random()*r.length)]})`;}
+    $("#genForm").onsubmit=e=>{e.preventDefault(); const uid=$("#uid").value.trim(); $("#mtBandText").textContent=genMT(uid); $("#mtBandResult").classList.remove("hidden");};
+    $("#copyMTBand").onclick=()=>{navigator.clipboard.writeText($("#mtBandText").textContent); toast("Copied!");};
+
+    const saved=getUser(); if(saved)showProfile(saved);
   </script>
 </body>
 </html>
